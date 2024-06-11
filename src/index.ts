@@ -1,15 +1,50 @@
-import fastify from "fastify";
+const fastify = require("fastify")({ logger: true });
+const fs = require("fs");
+const path = require("path");
+const cors = require("@fastify/cors");
 
-const server = fastify();
-
-server.get("/ping", async (request, reply) => {
-  return "pong\n";
+fastify.register(cors, {
+  origin: true,
 });
 
-server.listen({ port: 8080 }, (err, address) => {
-  if (err) {
-    console.error(err);
+// Function to recursively get the file structure
+const getFileStructure: any = (dir: string) => {
+  const result = [];
+  const items = fs.readdirSync(dir);
+  for (let item of items) {
+    const fullPath = path.join(dir, item);
+    const stats = fs.statSync(fullPath);
+    if (stats.isDirectory()) {
+      result.push({
+        name: item,
+        type: "folder",
+        children: getFileStructure(fullPath),
+      });
+    } else {
+      const content = fs.readFileSync(fullPath, "utf-8");
+      let lang = path.extname(item).split(".")[1];
+      lang = lang === "js" ? "javascript" : lang === "ts" ? "typescript" : lang;
+      result.push({ name: item, type: "file", content, lang });
+    }
+  }
+  return result;
+};
+
+fastify.get("/file-structure", async (request: Request, reply: Response) => {
+  const directoryPath = path.join(__dirname, "../sandbox_code"); // Adjust your directory path
+  const fileStructure = getFileStructure(directoryPath);
+
+  return fileStructure;
+});
+
+const start = async () => {
+  try {
+    await fastify.listen(3333);
+    fastify.log.info(`server listening on ${fastify.server.address().port}`);
+  } catch (err) {
+    fastify.log.error(err);
     process.exit(1);
   }
-  console.log(`Server listening at ${address}`);
-});
+};
+
+start();
