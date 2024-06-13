@@ -37,6 +37,19 @@ fastify.get("/file-structure", async (request: Request, reply: Response) => {
   return fileStructure;
 });
 
+fastify.post("/update-file", async (request: any, reply: any) => {
+  const { filePath, content } = request.body;
+  console.log(filePath, content);
+  const fullPath = path.join(__dirname, "../sandbox_code", filePath);
+
+  try {
+    fs.writeFileSync(fullPath, content, "utf-8");
+    reply.send({ success: true });
+  } catch (error: any) {
+    reply.status(500).send({ success: false, error: error.message });
+  }
+});
+
 const start = async () => {
   try {
     await fastify.listen(3333);

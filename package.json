@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "node ./dist/index.js"
+    "start": "node ./dist/index.js",
+    "run-sandbox": "pnpm exec parcel ./sandbox_code/index.html"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.12.12",
+    "parcel": "^2.12.0",
     "typescript": "^5.4.5"
   },
   "packageManager": "pnpm@9.0.6+sha512.f6d863130973207cb7a336d6b439a242a26ac8068077df530d6a86069419853dc1ffe64029ec594a9c505a3a410d19643c870aba6776330f5cfddcf10a9c1617"
